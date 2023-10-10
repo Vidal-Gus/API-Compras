@@ -44,6 +44,25 @@ const operacoes = {
             console.log(e);
             return res.status(500).json({ mensagem: "Erro no servidor!" })
         }
+    },
+    removerProduto: async function (req, res) {
+        const { id } = req.params;
+
+        try {
+            const query = `delete from lista_compras where id = $1 returning nome;`
+
+            const resultado = await mercado.query(query, [id]);
+
+            if (resultado.rowCount < 1) {
+                return res.status(404).json({ mensagem: "Item não encontrado!" })
+            }
+
+            return res.status(200).json({ item_removido: resultado.rows[0] })
+
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({ mensagem: "Erro no servidor!" })
+        }
     }
 }
 
