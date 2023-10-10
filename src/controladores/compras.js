@@ -63,6 +63,30 @@ const operacoes = {
             console.log(e);
             return res.status(500).json({ mensagem: "Erro no servidor!" })
         }
+    },
+    atualizarProduto: async function (req, res) {
+        const { nome, preco } = req.body;
+        const { id } = req.params;
+        if (!nome || !preco) {
+            return res.status(400).json({ mensagem: "Nome e preco são obrigatórios" })
+        }
+
+        try {
+            const query = `
+            update lista_compras set nome = $1, preco = $2 where id = $3 returning *;
+            `
+            const resultado = await mercado.query(query, [nome, preco, id])
+
+            if (resultado.rowCount < 1) {
+                return res.status(404).json({ mensagem: "Produto não encontrado" })
+            }
+
+            return res.status(200).json(resultado.rows)
+
+        } catch (e) {
+            console.log(e);
+            return res.status(500).json({ mensagem: "Erro no servidor" })
+        }
     }
 }
 
